@@ -1,0 +1,34 @@
+<?php
+
+namespace App\Http\Controllers;
+use App\Models\Post; 
+use App\Models\Category; 
+use Illuminate\Http\Request; 
+class BlogController extends Controller
+{
+    //
+    public function index(){
+        $posts = Post::orderBy('created_at')->where('status' , 'published')->paginate(10);
+        return view('blog.index', compact('posts'));
+    }
+    public function show($slug){
+        $post = Post::where('slug', $slug)->where('status', 'published')->first();
+        if(!$post) {
+            return redirect()->route('blog.index');
+        }
+        $category = Category::where('id', $post->category_id)->first();
+        return view('blog.view', compact('post', 'category'));
+    }
+    public function postsByCategory($slug){
+        $category = Category::where('slug', $slug)->first();
+        $posts = Post::where('category_id', $category->id)->where('status', 'published')->orderBy('created_at', 'desc')->paginate(10);
+        return view('blog.index', compact('posts'));
+    }
+    public function postsBySearch(Request $request){
+        $validated = $request->validate(['search' => 'required']);
+        $search = $validated['search'];
+        $posts = Post::where('title', 'like', '%' . $search . '%')->where('status', 'published')->orderBy('created_at', 'desc')->paginate(10);
+        return view('blog.index', compact('posts', 'search'));
+    }
+
+}
