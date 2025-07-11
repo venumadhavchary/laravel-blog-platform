@@ -9,13 +9,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\TagController;
 use Illuminate\Support\Facades\Auth;
 
-Route::get('/', function () {
-    if (Auth::check()) {
-        return redirect()->route('posts.index');
-    }
-    return view('welcome');
-})->name('home');
- 
+Route::get('/', [BlogController::class, 'home'])->name('home');
 Route::resource('blog', BlogController::class);
 Route::get('blog/category/{slug}', [BlogController::class, 'postsByCategory'])->name('blog.category');
 Route::post('blog/search', [BlogController::class, 'postsBySearch'])->name('blog.search');

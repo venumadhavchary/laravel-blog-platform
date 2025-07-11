@@ -1,12 +1,25 @@
 <?php
 
 namespace App\Http\Controllers;
-use App\Models\Post; 
-use App\Models\Category; 
-use Illuminate\Http\Request; 
+use App\Models\Post;
+use App\Models\Category;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 class BlogController extends Controller
 {
     //
+    public function home(){
+        if(Auth::check()){
+            return redirect()->route('posts.index');
+        }
+
+        $posts = Post::orderBy('created_at')->where('status', 'published')->limit(10)->get();
+        if(!$posts->count()){
+            return view('blog.index');
+        }
+        $categories = Category::all();
+        return view('blog.index', compact('posts', 'categories'));
+    }
     public function index(){
         $posts = Post::orderBy('created_at')->where('status' , 'published')->paginate(10);
         return view('blog.index', compact('posts'));
